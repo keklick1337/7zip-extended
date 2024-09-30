@@ -1,5 +1,7 @@
 7zz 24.08 patched by YSergey (abc321) and updated by Vladislav Tislenko (keklick1337)
 
+Edited: CPP/Common/Wildcard.h , CPP/Common/Wildcard.cpp , C/7zVersion.h
+
 We must add characters "$?" to the end of a mask's pattern which means that searching starts from the tail of a file's full path
 
 # for *NIX
