@@ -303,10 +303,10 @@ bool CItem::CheckPath(const UStringVector &pathParts, bool isFile) const
   
   // by abc321
   if (Reverse) {
-	  if (!isFile)
-		  return false;
-	  start = delta;
-	  finish = delta;
+    if (!isFile)
+      return false;
+    start = delta;
+    finish = delta;
   }
   // by abc321
 
@@ -622,8 +622,8 @@ void CCensor::AddItem(ECensorPathMode pathMode, bool include, const UString &pat
   UString path2 = path;
   bool Reverse = false;
   if (path.Len() > 1 && (UString)(path.RightPtr(2)) == L"$?") {
-	  Reverse = true;
-	  path2 = path.Left(path.Len() - 2);
+    Reverse = true;
+    path2 = path.Left(path.Len() - 2);
   }
 // by abc321
 
@@ -746,9 +746,9 @@ void CCensor::AddItem(ECensorPathMode pathMode, bool include, const UString &pat
 
   // by abc321
   if (Reverse) {
-	  forFile = true;
-	  forDir = true;
-	  props2.Recursive = false;
+    forFile = true;
+    forDir = true;
+    props2.Recursive = false;
   }
   // by abc321
 
