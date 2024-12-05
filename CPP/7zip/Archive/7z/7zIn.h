@@ -26,8 +26,12 @@ namespace N7z {
 #define Z7_7Z_DECODER_CRYPRO_VARS_DECL
 #define Z7_7Z_DECODER_CRYPRO_VARS
 #else
-#define Z7_7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
-#define Z7_7Z_DECODER_CRYPRO_VARS , getTextPassword, isEncrypted, passwordIsDefined, password
+// by abc321 \/
+#define Z7_7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, ICryptoGetNextPassword *getNextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
+#define Z7_7Z_DECODER_CRYPRO_VARS , getTextPassword, getNextPassword, isEncrypted, passwordIsDefined, password
+// by abc321 /\~
+//#define Z7_7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
+//#define Z7_7Z_DECODER_CRYPRO_VARS , getTextPassword, isEncrypted, passwordIsDefined, password
 #endif
 
 struct CParsedMethods

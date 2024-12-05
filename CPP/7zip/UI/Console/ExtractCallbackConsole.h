@@ -91,6 +91,7 @@ class CExtractCallbackConsole Z7_final:
   public IFolderArchiveExtractCallback2,
  #ifndef Z7_NO_CRYPTO
   public ICryptoGetTextPassword,
+  public ICryptoGetNextPassword, // by abc321
  #endif
  #ifndef Z7_SFX
   public IArchiveRequestMemoryUseCallback,
@@ -104,6 +105,7 @@ class CExtractCallbackConsole Z7_final:
   Z7_COM_QI_ENTRY(IFolderArchiveExtractCallback2)
  #ifndef Z7_NO_CRYPTO
   Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
+  Z7_COM_QI_ENTRY(ICryptoGetNextPassword) // by abc321
  #endif
  #ifndef Z7_SFX
   Z7_COM_QI_ENTRY(IArchiveRequestMemoryUseCallback)
@@ -119,6 +121,7 @@ class CExtractCallbackConsole Z7_final:
   Z7_IFACE_COM7_IMP(IFolderArchiveExtractCallback2)
  #ifndef Z7_NO_CRYPTO
   Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
+  Z7_IFACE_COM7_IMP(ICryptoGetNextPassword) // by abc321
  #endif
  #ifndef Z7_SFX
   Z7_IFACE_COM7_IMP(IArchiveRequestMemoryUseCallback)

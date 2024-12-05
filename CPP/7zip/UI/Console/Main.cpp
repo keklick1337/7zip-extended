@@ -163,7 +163,8 @@ static const char * const kHelpString =
     "  -o{Directory} : set Output directory\n"
     #ifndef Z7_NO_CRYPTO
     "  -p{Password} : set Password\n"
-    #endif
+	"  -fp{FileWithPassword[s]} : set FileWithPassword[s]\n" // by abc321
+#endif
     "  -r[-|0] : Recurse subdirectories for name search\n"
     "  -sa{a|e|s} : set Archive name mode\n"
     "  -scc{UTF-8|WIN|DOS} : set charset for console input/output\n"
@@ -1327,8 +1328,90 @@ int Main2(
       CExtractCallbackConsole *ecs = new CExtractCallbackConsole;
       CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
 
+	  // by abc321 \/
       #ifndef Z7_NO_CRYPTO
-      ecs->PasswordIsDefined = options.PasswordEnabled;
+	  if (options.PasswordFileEnabled) {
+		  HRESULT res;
+		  CExtractScanConsole scan;
+		  scan.Init(options.EnableHeaders ? g_StdStream : NULL,
+			  g_ErrStream, percentsStream,
+			  options.DisablePercents);
+		  scan.SetWindowWidth(consoleWidth);
+
+		  if (g_StdStream && options.EnableHeaders)
+			  *g_StdStream << "Scanning the drive for file with passwords:" << endl;
+
+		  scan.StartScanning();
+
+		  FStringVector paths;
+		  UStringVector fullPaths;
+		  CDirItemsStat st;
+		  {
+			  CDirItems dirItems;
+			  dirItems.Callback = &scan; // NULL;
+
+			  {
+				  NWildcard::CCensor arcCensor;
+				  arcCensor.AddPreItem_NoWildcard(options.PasswordFile);
+				  arcCensor.AddPathsToCensor(NWildcard::k_RelatPath);
+
+				  res = EnumerateItems(
+					  arcCensor,
+					  NWildcard::k_RelatPath,
+					  UString(), // addPathPrefix
+					  dirItems
+				  );
+				  st = dirItems.Stat;
+				  //RINOK(res)
+			  }
+
+			  FOR_VECTOR(i, dirItems.Items)
+			  {
+				  const CDirItem &dirItem = dirItems.Items[i];
+				  if (!dirItem.IsDir())
+					  paths.Add(dirItems.GetPhyPath(i));
+			  }
+		  }
+
+		  if (paths.Size() > 0) {
+			  unsigned i;
+
+			  for (i = 0; i < paths.Size(); i++)
+			  {
+				  FString fullPath;
+				  NFile::NDir::MyGetFullPathName(paths[i], fullPath);
+				  fullPaths.Add(fs2us(fullPath));
+			  }
+		  }
+
+		  scan.CloseScanning();
+		  if (res == S_OK)
+		  {
+			  if (fullPaths.Size() > 0) {
+				  if (options.EnableHeaders)
+					  scan.PrintStat(st);
+			  }
+
+			  options.PasswordFile = fullPaths[0];
+			  ecs->PasswordReader = new CPasswordReader(options.PasswordFile);
+			  if (!options.PasswordEnabled) {
+				  ecs->PasswordReader->GetNextPassword(&options.Password);
+				  if (wcslen(options.Password) > 0) {
+					  options.PasswordEnabled = true;
+					  ecs->PasswordBruteforced = true;
+				  }
+			  }
+		  }
+		  else {
+			  options.PasswordFileEnabled = false;
+			  options.PasswordFile = "";
+		  }
+	  }
+      #endif
+	  // by abc321 /\~
+
+      #ifndef Z7_NO_CRYPTO
+	  ecs->PasswordIsDefined = options.PasswordEnabled;
       ecs->Password = options.Password;
       #endif
 

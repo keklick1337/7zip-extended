@@ -531,6 +531,24 @@ Z7_COM7F_IMF(CExtractCallbackConsole::CryptoGetTextPassword(BSTR *password))
   COM_TRY_END
 }
 
+// by abc321 \/
+Z7_COM7F_IMF(CExtractCallbackConsole::CryptoGetNextPassword(BSTR *password))
+{
+	COM_TRY_BEGIN
+	MT_LOCK
+	return Open_CryptoGetNextPassword(password);
+	COM_TRY_END
+}
+
+Z7_COM7F_IMF(CExtractCallbackConsole::CryptoPasswordValid())
+{
+	ClosePercents_for_so();
+	COM_TRY_BEGIN
+	MT_LOCK
+	return Print_CryptoPasswordValid();
+	COM_TRY_END
+}
+// by abc321 /\~
 #endif
 
 

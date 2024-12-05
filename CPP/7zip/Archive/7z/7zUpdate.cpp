@@ -1784,6 +1784,7 @@ public:
   
   #ifndef Z7_NO_CRYPTO
   CMyComPtr<ICryptoGetTextPassword> getTextPassword;
+  CMyComPtr<ICryptoGetNextPassword> getNextPassword; // by abc321
   #endif
 
   DECL_EXTERNAL_CODECS_LOC_VARS_DECL
@@ -1869,11 +1870,35 @@ public:
   UString Password;
 };
 
+// by abc321 \/
+// not sure that this part is required
+Z7_CLASS_IMP_NOQIB_1(
+	CCryptoGetNextPassword
+	, ICryptoGetNextPassword
+)
+public:
+	UString Password;
+};
+// by abc321 /\~
+
 Z7_COM7F_IMF(CCryptoGetTextPassword::CryptoGetTextPassword(BSTR *password))
 {
   return StringToBstr(Password, password);
 }
 
+// by abc321 \/
+Z7_COM7F_IMF(CCryptoGetNextPassword::CryptoGetNextPassword(BSTR *password))
+{
+	// is not implemented correctly
+	return StringToBstr(Password, password);
+}
+
+Z7_COM7F_IMF(CCryptoGetNextPassword::CryptoPasswordValid())
+{
+	// is not implemented correctly
+	return S_OK;
+}
+// by abc321 /\~
 #endif
 
 
@@ -2180,6 +2205,7 @@ HRESULT Update(
 
   CCryptoGetTextPassword *getPasswordSpec = NULL;
   CMyComPtr<ICryptoGetTextPassword> getTextPassword;
+  CMyComPtr<ICryptoGetNextPassword> getNextPassword; // by abc321 - need impementation below
   if (needEncryptedRepack)
   {
     getPasswordSpec = new CCryptoGetTextPassword;

@@ -251,6 +251,7 @@ class CArchiveExtractCallback Z7_final:
   public IArchiveExtractCallback,
   public IArchiveExtractCallbackMessage2,
   public ICryptoGetTextPassword,
+  public ICryptoGetNextPassword, // by abc321
   public ICompressProgressInfo,
 #ifndef Z7_SFX
   public IArchiveUpdateCallbackFile,
@@ -262,6 +263,7 @@ class CArchiveExtractCallback Z7_final:
   /* IArchiveExtractCallback, */
   Z7_COM_QI_BEGIN2(IArchiveExtractCallbackMessage2)
   Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
+  Z7_COM_QI_ENTRY(ICryptoGetNextPassword) // by abc321
   Z7_COM_QI_ENTRY(ICompressProgressInfo)
 #ifndef Z7_SFX
   Z7_COM_QI_ENTRY(IArchiveUpdateCallbackFile)
@@ -275,6 +277,7 @@ class CArchiveExtractCallback Z7_final:
   Z7_IFACE_COM7_IMP(IArchiveExtractCallback)
   Z7_IFACE_COM7_IMP(IArchiveExtractCallbackMessage2)
   Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
+  Z7_IFACE_COM7_IMP(ICryptoGetNextPassword) // by abc321
   Z7_IFACE_COM7_IMP(ICompressProgressInfo)
 #ifndef Z7_SFX
   Z7_IFACE_COM7_IMP(IArchiveUpdateCallbackFile)
@@ -326,6 +329,7 @@ private:
   // CMyComPtr<IArchiveExtractCallbackMessage2> _callbackMessage;
   CMyComPtr<IFolderArchiveExtractCallback2> _folderArchiveExtractCallback2;
   CMyComPtr<ICryptoGetTextPassword> _cryptoGetTextPassword;
+  CMyComPtr<ICryptoGetNextPassword> _cryptoGetNextPassword; // by abc321
 
   FString _dirPathPrefix;
   FString _dirPathPrefix_Full;

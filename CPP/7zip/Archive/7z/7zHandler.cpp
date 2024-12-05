@@ -690,8 +690,11 @@ Z7_COM7F_IMF(CHandler::Open(IInStream *stream,
 
     #ifndef Z7_NO_CRYPTO
     CMyComPtr<ICryptoGetTextPassword> getTextPassword;
+    CMyComPtr<ICryptoGetNextPassword> getNextPassword; // by abc321
     if (openArchiveCallback)
       openArchiveCallbackTemp.QueryInterface(IID_ICryptoGetTextPassword, &getTextPassword);
+    if (openArchiveCallback) // by abc321
+      openArchiveCallbackTemp.QueryInterface(IID_ICryptoGetNextPassword, &getNextPassword); // by abc321
     #endif
 
     CInArchive archive(
@@ -709,7 +712,8 @@ Z7_COM7F_IMF(CHandler::Open(IInStream *stream,
         EXTERNAL_CODECS_VARS
         _db
         #ifndef Z7_NO_CRYPTO
-          , getTextPassword, _isEncrypted, _passwordIsDefined, _password
+          //, getTextPassword, _isEncrypted, _passwordIsDefined, _password 
+          , getTextPassword, getNextPassword, _isEncrypted, _passwordIsDefined, _password // by abc321
         #endif
         );
     RINOK(result)

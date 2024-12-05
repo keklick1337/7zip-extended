@@ -431,6 +431,8 @@ HRESULT CDecoder::Decode(
         isEncrypted = true;
         if (!getTextPassword)
           return E_NOTIMPL;
+        if (!getNextPassword) // by abc321
+          return E_NOTIMPL; // by abc321
         CMyComBSTR_Wipe passwordBSTR;
         RINOK(getTextPassword->CryptoGetTextPassword(&passwordBSTR))
         passwordIsDefined = true;

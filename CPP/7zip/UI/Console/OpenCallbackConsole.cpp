@@ -93,6 +93,42 @@ HRESULT COpenCallbackConsole::Open_CryptoGetTextPassword(BSTR *password)
   return StringToBstr(Password, password);
 }
 
+// by abc321 \/
+HRESULT COpenCallbackConsole::Open_CryptoGetNextPassword(BSTR *password)
+{
+	*password = NULL;
+	RINOK(CheckBreak2())
+
+	if (PasswordReader) {
+		ClosePercents();
+		Password = "";
+		PasswordBruteforced = false;
+		RINOK(PasswordReader->GetNextPassword(&Password));
+		if (wcslen(Password) > 0)
+			PasswordBruteforced = true;
+	}
+
+	return StringToBstr(Password, password);
+}
+
+HRESULT COpenCallbackConsole::Print_CryptoPasswordValid()
+{
+	RINOK(CheckBreak2())
+
+		if (PasswordReader) {
+			if (_so && PasswordBruteforced && wcslen(Password) > 0) {
+				// Encoding to CP866 should implemented if needed
+        if (! PasswordPrinted) {
+				  *_so << "Password '" << Password << "' is valid for archive" << endl;
+          PasswordPrinted = true; // by keklick1337
+        }
+			}
+		}
+
+	return S_OK;
+}
+// by abc321 /\~
+
 /*
 HRESULT COpenCallbackConsole::Open_GetPasswordIfAny(bool &passwordIsDefined, UString &password)
 {

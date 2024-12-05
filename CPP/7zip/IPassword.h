@@ -50,5 +50,12 @@ out:
   x(CryptoGetTextPassword2(Int32 *passwordIsDefined, BSTR *password))
 Z7_IFACE_CONSTR_PASSWORD(ICryptoGetTextPassword2, 0x11)
 
+// by abc321 \/
+#define Z7_IFACEM_ICryptoGetNextPassword(x) \
+  x(CryptoGetNextPassword(BSTR *password)) \
+  x(CryptoPasswordValid())
+Z7_IFACE_CONSTR_PASSWORD(ICryptoGetNextPassword, 0x12)
+// by abc321 /\~
+
 Z7_PURE_INTERFACES_END
 #endif

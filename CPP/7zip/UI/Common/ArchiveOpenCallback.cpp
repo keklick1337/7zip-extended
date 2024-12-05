@@ -384,6 +384,43 @@ Z7_COM7F_IMF(COpenCallbackImp::CryptoGetTextPassword(BSTR *password))
   return Callback->Open_CryptoGetTextPassword(password);
   COM_TRY_END
 }
+
+// by abc321 \/
+Z7_COM7F_IMF(COpenCallbackImp::CryptoGetNextPassword(BSTR *password))
+{
+	COM_TRY_BEGIN
+		if (ReOpenCallback)
+		{
+			Z7_DECL_CMyComPtr_QI_FROM(
+				ICryptoGetNextPassword,
+				getNextPassword, ReOpenCallback)
+				if (getNextPassword)
+					return getNextPassword->CryptoGetNextPassword(password);
+		}
+	if (!Callback)
+		return E_NOTIMPL;
+	PasswordWasAsked = true;
+	return Callback->Open_CryptoGetNextPassword(password);
+	COM_TRY_END
+}
+
+Z7_COM7F_IMF(COpenCallbackImp::CryptoPasswordValid())
+{
+	COM_TRY_BEGIN
+		if (ReOpenCallback)
+		{
+			Z7_DECL_CMyComPtr_QI_FROM(
+				ICryptoGetNextPassword,
+				getNextPassword, ReOpenCallback)
+				if (getNextPassword)
+					return getNextPassword->CryptoPasswordValid();
+		}
+	if (!Callback)
+		return E_NOTIMPL;
+	return Callback->Print_CryptoPasswordValid();
+	COM_TRY_END
+}
+// by abc321 /\~
 #endif
 
 // IProgress

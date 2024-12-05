@@ -362,9 +362,12 @@ Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
 
     #ifndef Z7_NO_CRYPTO
     CMyComPtr<ICryptoGetTextPassword> getTextPassword;
+    CMyComPtr<ICryptoGetNextPassword> getNextPassword; // by abc321
     if (extractCallback)
       extractCallback.QueryInterface(IID_ICryptoGetTextPassword, &getTextPassword);
-    #endif
+    if (extractCallback) // by abc321
+      extractCallback.QueryInterface(IID_ICryptoGetNextPassword, &getNextPassword); // by abc321
+#endif
 
     try
     {

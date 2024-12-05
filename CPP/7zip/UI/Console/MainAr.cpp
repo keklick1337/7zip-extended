@@ -147,7 +147,7 @@ int Z7_CDECL main
   }
   catch(const CMessagePathException &e)
   {
-    PrintError(kException_CmdLine_Error_Message);
+     PrintError(kException_CmdLine_Error_Message);
     if (g_ErrStream)
       *g_ErrStream << e << endl;
     return (NExitCode::kUserError);

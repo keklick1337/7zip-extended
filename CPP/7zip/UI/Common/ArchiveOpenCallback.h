@@ -24,6 +24,8 @@ Z7_PURE_INTERFACES_BEGIN
 
 #define Z7_IFACEM_IOpenCallbackUI_Crypto(x) \
   virtual HRESULT Open_CryptoGetTextPassword(BSTR *password) x \
+  virtual HRESULT Open_CryptoGetNextPassword(BSTR *password) x /* by abc321*/ \
+  virtual HRESULT Print_CryptoPasswordValid() x /* by abc321*/ \
   /* virtual HRESULT Open_GetPasswordIfAny(bool &passwordIsDefined, UString &password) x */ \
   /* virtual bool Open_WasPasswordAsked() x */ \
   /* virtual void Open_Clear_PasswordWasAsked_Flag() x */  \
@@ -100,7 +102,8 @@ class COpenCallbackImp Z7_final:
   public IArchiveOpenSetSubArchiveName,
  #ifndef Z7_NO_CRYPTO
   public ICryptoGetTextPassword,
- #endif
+  public ICryptoGetNextPassword, // by abc321
+#endif
   public IProgress, // IProgress is used for 7zFM
   public CMyUnknownImp
 {
@@ -109,7 +112,8 @@ class COpenCallbackImp Z7_final:
   Z7_COM_QI_ENTRY(IArchiveOpenSetSubArchiveName)
  #ifndef Z7_NO_CRYPTO
   Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
- #endif
+  Z7_COM_QI_ENTRY(ICryptoGetNextPassword) // by abc321
+#endif
   // Z7_COM_QI_ENTRY(IProgress) // the code doesn't require it
   Z7_COM_QI_END
   Z7_COM_ADDREF_RELEASE
@@ -122,7 +126,8 @@ public:
 private:
  #ifndef Z7_NO_CRYPTO
   Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
- #endif
+  Z7_IFACE_COM7_IMP(ICryptoGetNextPassword) // by abc321
+#endif
 
   bool _subArchiveMode;
 

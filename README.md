@@ -1,13 +1,19 @@
 7zz 24.08 patched by YSergey (abc321) and updated by Vladislav Tislenko (keklick1337)
 
-Edited: CPP/Common/Wildcard.h , CPP/Common/Wildcard.cpp , C/7zVersion.h
+## Use passwords list to open archive (new feature)
+
+You can use `-fp` argument with selection passwords list
+`./7zz x test.7z -fppasswords.txt`
+7zz will try all passwords from list to open archive.
+
+## Unpack files with mask in filename (new feature)
 
 We must add characters "$?" to the end of a mask's pattern which means that searching starts from the tail of a file's full path
 
-# for *NIX
+### for *NIX
 `./7zz x test.7z -i'!*/*ense*.txt$?' -i'!*/*ip*.hhp$?' -i'!*.mak$?' -ssc-`
 
-# for WINDOWS
+### for WINDOWS
 `7zz.exe x test.7z -i!*/*ense*.txt$? -i!*/*ip*.hhp$? -i!*.mak$? -ssc-`
 
 An example below also extracts necessary files from test.7z archive by original 7zz application.
@@ -15,7 +21,7 @@ Though some folders containing matching words are extracted as well.
 
 `7zz.exe x test.7z -i!*\*example*.txt -i!*\*test*.txt -i!*.rar -i!*.zip -i!*.7z -r`
 
-# Build instruction (just example for debian)
+## Build instruction (Example for debian)
 ```bash
 apt update -y
 apt install make gcc libc-dev git -y

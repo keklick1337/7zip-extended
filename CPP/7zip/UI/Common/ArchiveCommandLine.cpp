@@ -180,6 +180,7 @@ enum Enum
 
   #ifndef Z7_NO_CRYPTO
   , kPassword
+  , kPasswordFile // by abc321
   #endif
 };
 
@@ -331,6 +332,7 @@ static const CSwitchForm kSwitchForms[] =
 
   #ifndef Z7_NO_CRYPTO
   , { "p", SWFRM_STRING }
+  , { "fp", SWFRM_STRING }
   #endif
 };
 
@@ -1430,7 +1432,12 @@ void CArcCmdLineParser::Parse2(CArcCmdLineOptions &options)
   options.PasswordEnabled = parser[NKey::kPassword].ThereIs;
   if (options.PasswordEnabled)
     options.Password = parser[NKey::kPassword].PostStrings[0];
-  #endif
+  // by abc321 \/
+  options.PasswordFileEnabled = parser[NKey::kPasswordFile].ThereIs;
+  if (options.PasswordFileEnabled)
+	  options.PasswordFile = parser[NKey::kPasswordFile].PostStrings[0];
+  // by abc321 /\~
+#endif
 
   options.ShowDialog = parser[NKey::kShowDialog].ThereIs;
 
