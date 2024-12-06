@@ -103,12 +103,15 @@ HRESULT COpenCallbackConsole::Open_CryptoGetNextPassword(BSTR *password)
 		ClosePercents();
 		Password = "";
 		PasswordBruteforced = false;
-		RINOK(PasswordReader->GetNextPassword(&Password));
-		if (wcslen(Password) > 0)
-			PasswordBruteforced = true;
+		//RINOK(PasswordReader->GetNextPassword(&Password));
+		if (PasswordReader->GetNextPassword(&Password) == S_OK) {
+			if (wcslen(Password) > 0)
+				PasswordBruteforced = true;
+			return StringToBstr(Password, password);
+		}
 	}
 
-	return StringToBstr(Password, password);
+	return S_FALSE;
 }
 
 HRESULT COpenCallbackConsole::Print_CryptoPasswordValid()
@@ -116,12 +119,10 @@ HRESULT COpenCallbackConsole::Print_CryptoPasswordValid()
 	RINOK(CheckBreak2())
 
 		if (PasswordReader) {
-			if (_so && PasswordBruteforced && wcslen(Password) > 0) {
+			if (_so && PasswordBruteforced && !PasswordPrinted && wcslen(Password) > 0) {
 				// Encoding to CP866 should implemented if needed
-        if (! PasswordPrinted) {
-				  *_so << "Password '" << Password << "' is valid for archive" << endl;
-          PasswordPrinted = true; // by keklick1337
-        }
+				*_so << "Password '" << Password << "' is valid for archive" << endl;
+				PasswordPrinted = true;
 			}
 		}
 

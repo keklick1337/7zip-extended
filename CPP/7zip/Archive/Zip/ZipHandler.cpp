@@ -1322,9 +1322,11 @@ HRESULT CZipDecoder::Decode(
 						  // abc321 code \/
 						  if (getNextPassword)
 						  {
-							  RINOK(getNextPassword->CryptoGetNextPassword(&password))
-							  if (password && (&password != NULL) && (wcslen(&password[0]) > 0))
-								  passwordTested = false;
+							  //RINOK(getNextPassword->CryptoGetNextPassword(&password))
+							  if (getNextPassword->CryptoGetNextPassword(&password) == S_OK) {
+								  if (password && (&password != NULL) && (wcslen(&password[0]) > 0))
+									  passwordTested = false;
+							  }
 						  }
 						  if (passwordTested) {
 							  // abc321 code /\~
@@ -1353,9 +1355,11 @@ HRESULT CZipDecoder::Decode(
 						  // this part of code has not been tested yet
 						  if (getNextPassword)
 						  {
-							  RINOK(getNextPassword->CryptoGetNextPassword(&password))
-							  if (password && (&password != NULL) && (wcslen(&password[0]) > 0))
-								  passwordTested = false;
+							  //RINOK(getNextPassword->CryptoGetNextPassword(&password))
+							  if (getNextPassword->CryptoGetNextPassword(&password) == S_OK) {
+								  if (password && (&password != NULL) && (wcslen(&password[0]) > 0))
+									  passwordTested = false;
+							  }
 						  }
 						  if (passwordTested) {
 							  // abc321 code /\~
@@ -1393,9 +1397,11 @@ HRESULT CZipDecoder::Decode(
 					  if (v1 != v2) {
 						  if (getNextPassword)
 						  {
-							  RINOK(getNextPassword->CryptoGetNextPassword(&password))
-							  if (password && (&password != NULL) && (wcslen(&password[0]) > 0))
-								  passwordTested = false;
+							  //RINOK(getNextPassword->CryptoGetNextPassword(&password))
+							  if (getNextPassword->CryptoGetNextPassword(&password) == S_OK) {
+								  if (password && (&password != NULL) && (wcslen(&password[0]) > 0))
+									  passwordTested = false;
+							  }
 						  }
 					  }
 					  if (passwordTested)

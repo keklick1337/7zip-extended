@@ -179,7 +179,7 @@ public:
       // , PasswordWasAsked(false)
 	  , PasswordReader(NULL) // by abc321
 	  , PasswordBruteforced(false) // by abc321
-	  , PasswordPrinted(false) // by keklick1337
+	  , PasswordPrinted(false) // by abc321
       #endif
       
       {}
@@ -206,8 +206,8 @@ public:
   UString Password;
   CPasswordReader *PasswordReader; // by abc321
   bool PasswordBruteforced; // by abc321
-  bool PasswordPrinted; //by keklick1337
-  #endif
+  bool PasswordPrinted; // by abc321
+#endif
 };
 
 #endif

@@ -1230,13 +1230,12 @@ HRESULT CInArchive::ReadAndDecodePackedStreams(
 			if (folders.FolderCRCs.ValidAndDefined(i)) {
 				if (CrcCalc(data, unpackSize) != folders.FolderCRCs.Vals[i]) {
 					CMyComBSTR_Wipe passwordBSTR;
-					RINOK(getNextPassword->CryptoGetNextPassword(&passwordBSTR))
-					if (passwordBSTR)
-					{
+					//RINOK(getNextPassword->CryptoGetNextPassword(&passwordBSTR))
+					getNextPassword->CryptoGetNextPassword(&passwordBSTR);
+					if (passwordBSTR) {
 						password = passwordBSTR;
 						passwordTested = false;
 					}
-
 				}
 				else {
 					getNextPassword->CryptoPasswordValid();
