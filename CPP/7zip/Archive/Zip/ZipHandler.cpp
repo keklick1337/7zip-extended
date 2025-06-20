@@ -1484,6 +1484,8 @@ HRESULT CZipDecoder::Decode(
 			  result =
 				  cryptoSetPassword->CryptoSetPassword(
 				  (const Byte *)(const char *)charPassword, charPassword.Len());
+			  if ((result == E_INVALIDARG) && (charPassword.Len() > 1) && !passwordTested) // abc321 on 20250619
+				  result = S_OK; // abc321
 			  if (result != S_OK)
 			  {
 				  res = NExtract::NOperationResult::kWrongPassword;
