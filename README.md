@@ -1,4 +1,4 @@
-7zz 24.08 patched by YSergey (abc321) and updated by Vladislav Tislenko (keklick1337)
+7zz 25.00 with additional options
 
 ## Use passwords list to open archive (new feature)
 

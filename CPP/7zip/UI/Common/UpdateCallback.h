@@ -93,16 +93,16 @@ class CArchiveUpdateCallback Z7_final:
   public CMyUnknownImp
 {
   Z7_COM_QI_BEGIN2(IArchiveUpdateCallback2)
-  Z7_COM_QI_ENTRY(IArchiveUpdateCallbackFile)
-  // Z7_COM_QI_ENTRY(IArchiveUpdateCallbackArcProp)
-  Z7_COM_QI_ENTRY(IArchiveExtractCallbackMessage2)
-  Z7_COM_QI_ENTRY(IArchiveGetRawProps)
-  Z7_COM_QI_ENTRY(IArchiveGetRootProps)
-  Z7_COM_QI_ENTRY(ICryptoGetTextPassword2)
-  Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
-  //Z7_COM_QI_ENTRY(ICryptoGetNextPassword) // by abc321
-  //Z7_COM_QI_ENTRY(ICryptoPasswordValid) // by abc321
-  Z7_COM_QI_ENTRY(ICompressProgressInfo)
+    Z7_COM_QI_ENTRY(IArchiveUpdateCallbackFile)
+    // Z7_COM_QI_ENTRY(IArchiveUpdateCallbackArcProp)
+    Z7_COM_QI_ENTRY(IArchiveExtractCallbackMessage2)
+    Z7_COM_QI_ENTRY(IArchiveGetRawProps)
+    Z7_COM_QI_ENTRY(IArchiveGetRootProps)
+    Z7_COM_QI_ENTRY(ICryptoGetTextPassword2)
+    Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
+    //Z7_COM_QI_ENTRY(ICryptoGetNextPassword) // by abc321
+    //Z7_COM_QI_ENTRY(ICryptoPasswordValid) // by abc321
+    Z7_COM_QI_ENTRY(ICompressProgressInfo)
   Z7_COM_QI_END
   Z7_COM_ADDREF_RELEASE
 
@@ -120,6 +120,7 @@ class CArchiveUpdateCallback Z7_final:
   Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
   //Z7_IFACE_COM7_IMP(ICryptoGetNextPassword) // by abc321
   //Z7_IFACE_COM7_IMP(ICryptoPasswordValid) // by abc321
+
 
   void UpdateProcessedItemStatus(unsigned dirIndex);
 

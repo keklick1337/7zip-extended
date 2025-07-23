@@ -91,7 +91,7 @@ struct CArcCmdLineOptions
   UString Password;
   bool PasswordFileEnabled; // by abc321
   UString PasswordFile; // by abc321
-#endif
+  #endif
 
   UStringVector HashMethods;
   // UString HashFilePath;

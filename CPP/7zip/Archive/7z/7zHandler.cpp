@@ -712,7 +712,7 @@ Z7_COM7F_IMF(CHandler::Open(IInStream *stream,
         EXTERNAL_CODECS_VARS
         _db
         #ifndef Z7_NO_CRYPTO
-          //, getTextPassword, _isEncrypted, _passwordIsDefined, _password 
+          //, getTextPassword, _isEncrypted, _passwordIsDefined, _password
           , getTextPassword, getNextPassword, _isEncrypted, _passwordIsDefined, _password // by abc321
         #endif
         );

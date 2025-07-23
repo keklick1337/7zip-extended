@@ -1,4 +1,4 @@
-﻿// OpenCallbackConsole.h
+// OpenCallbackConsole.h
 
 #ifndef ZIP7_INC_OPEN_CALLBACK_CONSOLE_H
 #define ZIP7_INC_OPEN_CALLBACK_CONSOLE_H
@@ -207,7 +207,7 @@ public:
   CPasswordReader *PasswordReader; // by abc321
   bool PasswordBruteforced; // by abc321
   bool PasswordPrinted; // by abc321
-#endif
+  #endif
 };
 
 #endif

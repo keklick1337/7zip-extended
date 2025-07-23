@@ -393,6 +393,7 @@ void CItem::Link_to_Prop(unsigned linkType, NWindows::NCOM::CPropVariant &prop) 
   if (!FindExtra_Link(link))
     return;
 
+  bool isWindows = (HostOS == kHost_Windows);
   if (link.Type != linkType)
   {
     if (linkType != NLinkType::kUnixSymLink)
@@ -400,8 +401,11 @@ void CItem::Link_to_Prop(unsigned linkType, NWindows::NCOM::CPropVariant &prop) 
     switch ((unsigned)link.Type)
     {
       case NLinkType::kUnixSymLink:
+        isWindows = false;
+        break;
       case NLinkType::kWinSymLink:
       case NLinkType::kWinJunction:
+        isWindows = true;
         break;
       default: return;
     }
@@ -409,10 +413,15 @@ void CItem::Link_to_Prop(unsigned linkType, NWindows::NCOM::CPropVariant &prop) 
 
   AString s;
   s.SetFrom_CalcLen((const char *)(Extra + link.NameOffset), link.NameLen);
-
   UString unicode;
   ConvertUTF8ToUnicode(s, unicode);
-  prop = NItemName::GetOsPath(unicode);
+  // rar5.0  used '\\' separator for windows symlinks and \??\ prefix for abs paths.
+  // rar5.1+ uses '/'  separator for windows symlinks and /??/ prefix for abs paths.
+  // v25.00: we convert Windows slashes to Linux slashes:
+  if (isWindows)
+    unicode.Replace(L'\\', L'/');
+  prop = unicode;
+  // prop = NItemName::GetOsPath(unicode);
 }
 
 bool CItem::GetAltStreamName(AString &name) const
@@ -663,6 +672,9 @@ HRESULT CInArchive::ReadBlockHeader(CHeader &h)
     RINOK(ReadStream_Check(_buf, AES_BLOCK_SIZE * 2))
     memcpy(m_CryptoDecoder->_iv, _buf, AES_BLOCK_SIZE);
     RINOK(m_CryptoDecoder->Init())
+    // we call RAR5_AES_Filter with:
+    //   data_ptr  == aligned_ptr + 16
+    //   data_size == 16
     if (m_CryptoDecoder->Filter(_buf + AES_BLOCK_SIZE, AES_BLOCK_SIZE) != AES_BLOCK_SIZE)
       return E_FAIL;
     memcpy(buf, _buf + AES_BLOCK_SIZE, AES_BLOCK_SIZE);
@@ -694,10 +706,14 @@ HRESULT CInArchive::ReadBlockHeader(CHeader &h)
       return E_OUTOFMEMORY;
     memcpy(_buf, buf, filled);
     const size_t rem = size - filled;
+    // if (m_CryptoMode), we add AES_BLOCK_SIZE here, because _iv is not included to size.
     AddToSeekValue(size + (m_CryptoMode ? AES_BLOCK_SIZE : 0));
     RINOK(ReadStream_Check(_buf + filled, rem))
     if (m_CryptoMode)
     {
+      // we call RAR5_AES_Filter with:
+      //   data_ptr  == aligned_ptr + 16
+      //   (rem) can be big
       if (m_CryptoDecoder->Filter(_buf + filled, (UInt32)rem) != rem)
         return E_FAIL;
 #if 1
@@ -916,8 +932,8 @@ HRESULT CInArchive::Open(IInStream *stream, const UInt64 *searchHeaderSizeLimit,
 		}
 		if (passwordTested) {
 		// by abc321 /\~
-			WrongPassword = True;
-			return S_FALSE;
+		      WrongPassword = True;
+		      return S_FALSE;
 		} // by abc321
     }
 	// by abc321 \/
@@ -1100,7 +1116,8 @@ HRESULT CUnpacker::Create(DECL_EXTERNAL_CODECS_LOC_VARS
 
     CMyComPtr<ICompressSetDecoderProperties2> csdp;
     RINOK(lzCoder.QueryInterface(IID_ICompressSetDecoderProperties2, &csdp))
-
+    if (!csdp)
+      return E_NOTIMPL;
     const unsigned ver = item.Get_AlgoVersion_HuffRev();
     if (ver > 1)
       return E_NOTIMPL;
@@ -3410,9 +3427,9 @@ Z7_COM7F_IMF(CHandler::SetProperties(const wchar_t * const *names, const PROPVAR
     }
     else if (name.IsPrefixedBy_Ascii_NoCase("memx"))
     {
-      UInt64 memAvail;
+      size_t memAvail;
       if (!NWindows::NSystem::GetRamSize(memAvail))
-        memAvail = (UInt64)(sizeof(size_t)) << 28;
+        memAvail = (size_t)sizeof(size_t) << 28;
       UInt64 v;
       if (!ParseSizeString(name.Ptr(4), prop, memAvail, v))
         return E_INVALIDARG;

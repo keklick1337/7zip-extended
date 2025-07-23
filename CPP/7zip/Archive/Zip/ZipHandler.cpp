@@ -1260,7 +1260,7 @@ HRESULT CZipDecoder::Decode(
       );
 
   {
-	  HRESULT result = S_OK;
+    HRESULT result = S_OK;
 
 	  // abc321 code \/
 	  /*
@@ -1299,26 +1299,26 @@ HRESULT CZipDecoder::Decode(
 		  password.Wipe_and_Free();
 		  // abc321 code /\~
 
-		  if (item.IsEncrypted())
-		  {
+    if (item.IsEncrypted())
+    {
 			  // abc321 code \/
 			  if (!getNextPassword)
 				  extractCallback->QueryInterface(IID_ICryptoGetNextPassword, (void **)&getNextPassword);
 			  // abc321 code /\~
 
-			  if (!filterStream.IsDefined())
-				  filterStream.SetFromCls(new CFilterCoder(false));
-
-			  filterReleaser.FilterCoder = filterStream.ClsPtr();
-			  filterStream->Filter = cryptoFilter;
-
-			  if (wzAesMode)
-			  {
-				  result = _wzAesDecoder->ReadHeader(inStream);
-				  if (result == S_OK)
-				  {
-					  if (!_wzAesDecoder->Init_and_CheckPassword())
-					  {
+      if (!filterStream.IsDefined())
+        filterStream.SetFromCls(new CFilterCoder(false));
+     
+      filterReleaser.FilterCoder = filterStream.ClsPtr();
+      filterStream->Filter = cryptoFilter;
+      
+      if (wzAesMode)
+      {
+        result = _wzAesDecoder->ReadHeader(inStream);
+        if (result == S_OK)
+        {
+          if (!_wzAesDecoder->Init_and_CheckPassword())
+          {
 						  // abc321 code \/
 						  if (getNextPassword)
 						  {
@@ -1331,26 +1331,24 @@ HRESULT CZipDecoder::Decode(
 						  if (passwordTested) {
 							  // abc321 code /\~
 
-							  res = NExtract::NOperationResult::kWrongPassword;
-							  return S_OK;
-
+            res = NExtract::NOperationResult::kWrongPassword;
+            return S_OK;
 							  // abc321 code \/
 						  }
 						  // abc321 code /\~
-
-					  }
-				  }
-			  }
-			  else if (pkAesMode)
-			  {
-				  isFullStreamExpected = false;
-				  result = _pkAesDecoder->ReadHeader(inStream, item.Crc, item.Size);
-				  if (result == S_OK)
-				  {
-					  bool passwOK;
-					  result = _pkAesDecoder->Init_and_CheckPassword(passwOK);
-					  if (result == S_OK && !passwOK)
-					  {
+          }
+        }
+      }
+      else if (pkAesMode)
+      {
+        isFullStreamExpected = false;
+        result = _pkAesDecoder->ReadHeader(inStream, item.Crc, item.Size);
+        if (result == S_OK)
+        {
+          bool passwOK;
+          result = _pkAesDecoder->Init_and_CheckPassword(passwOK);
+          if (result == S_OK && !passwOK)
+          {
 						  // abc321 code \/
 						  // this part of code has not been tested yet
 						  if (getNextPassword)
@@ -1363,35 +1361,34 @@ HRESULT CZipDecoder::Decode(
 						  }
 						  if (passwordTested) {
 							  // abc321 code /\~
-							  						  
-							  res = NExtract::NOperationResult::kWrongPassword;
-							  return S_OK;
 
+            res = NExtract::NOperationResult::kWrongPassword;
+            return S_OK;
 						  // abc321 code \/
 						  }
 						  // abc321 code /\~
-						  					  
-					  }
-				  }
-			  }
-			  else
-			  {
-				  result = _zipCryptoDecoder->ReadHeader(inStream);
-				  if (result == S_OK)
-				  {
-					  _zipCryptoDecoder->Init_BeforeDecode();
 
-					  /* Info-ZIP modification to ZipCrypto format:
-						   if bit 3 of the general purpose bit flag is set,
-						   it uses high byte of 16-bit File Time.
-						 Info-ZIP code probably writes 2 bytes of File Time.
-						 We check only 1 byte. */
+          }
+        }
+      }
+      else
+      {
+        result = _zipCryptoDecoder->ReadHeader(inStream);
+        if (result == S_OK)
+        {
+          _zipCryptoDecoder->Init_BeforeDecode();
+          
+          /* Info-ZIP modification to ZipCrypto format:
+               if bit 3 of the general purpose bit flag is set,
+               it uses high byte of 16-bit File Time.
+             Info-ZIP code probably writes 2 bytes of File Time.
+             We check only 1 byte. */
 
-						 // UInt32 v1 = GetUi16(_zipCryptoDecoder->_header + NCrypto::NZip::kHeaderSize - 2);
-						 // UInt32 v2 = (item.HasDescriptor() ? (item.Time & 0xFFFF) : (item.Crc >> 16));
+          // UInt32 v1 = GetUi16(_zipCryptoDecoder->_header + NCrypto::NZip::kHeaderSize - 2);
+          // UInt32 v2 = (item.HasDescriptor() ? (item.Time & 0xFFFF) : (item.Crc >> 16));
 
-					  Byte v1 = _zipCryptoDecoder->_header[NCrypto::NZip::kHeaderSize - 1];
-					  Byte v2 = (Byte)(item.HasDescriptor() ? (item.Time >> 8) : (item.Crc >> 24));
+          Byte v1 = _zipCryptoDecoder->_header[NCrypto::NZip::kHeaderSize - 1];
+          Byte v2 = (Byte)(item.HasDescriptor() ? (item.Time >> 8) : (item.Crc >> 24));
 
 					  // abc321 code \/
 					  if (v1 != v2) {
@@ -1407,14 +1404,15 @@ HRESULT CZipDecoder::Decode(
 					  if (passwordTested)
 						  // abc321 code /\~
 
-						  if (v1 != v2)
-						  {
-							  res = NExtract::NOperationResult::kWrongPassword;
-							  return S_OK;
-						  }
-				  }
-			  }
-		  }
+          if (v1 != v2)
+          {
+            res = NExtract::NOperationResult::kWrongPassword;
+            return S_OK;
+          }
+        }
+      }
+    }
+
 		  // abc321 code \/
 
 		  if (!passwordTested) {

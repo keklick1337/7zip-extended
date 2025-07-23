@@ -90,25 +90,10 @@ struct CExtractNtOptions
   }
 };
 
-#ifndef Z7_SFX
-
-Z7_CLASS_IMP_COM_1(
-  CGetProp
-  , IGetProp
-)
-public:
-  UInt32 IndexInArc;
-  const CArc *Arc;
-  // UString Name; // relative path
-};
-
-#endif
 
 #ifndef Z7_SFX
 #ifndef UNDER_CE
-
 #define SUPPORT_LINKS
-
 #endif
 #endif
 
@@ -193,36 +178,50 @@ struct CDirPathTime: public CFiTimesCAM
 
 #ifdef SUPPORT_LINKS
 
+
+enum ELinkType
+{
+  k_LinkType_HardLink,
+  k_LinkType_PureSymLink,
+  k_LinkType_Junction,
+  k_LinkType_WSL
+  // , k_LinkType_CopyLink;
+};
+
+
 struct CLinkInfo
 {
-  // bool isCopyLink;
-  bool isHardLink;
-  bool isJunction;
+  ELinkType LinkType;
   bool isRelative;
-  bool isWSL;
-  UString linkPath;
+    //  if (isRelative == false), then (LinkPath) is relative to root folder of archive
+    //  if (isRelative == true ), then (LinkPath) is relative to current item
+  bool isWindowsPath;
+  UString LinkPath;
 
-  bool IsSymLink() const { return !isHardLink; }
+  bool Is_HardLink() const { return LinkType == k_LinkType_HardLink; }
+  bool Is_AnySymLink() const { return LinkType != k_LinkType_HardLink; }
+
+  bool Is_WSL() const { return LinkType == k_LinkType_WSL; }
 
   CLinkInfo():
-    // IsCopyLink(false),
-    isHardLink(false),
-    isJunction(false),
+    LinkType(k_LinkType_PureSymLink),
     isRelative(false),
-    isWSL(false)
+    isWindowsPath(false)
     {}
 
   void Clear()
   {
-    // IsCopyLink = false;
-    isHardLink = false;
-    isJunction = false;
+    LinkType = k_LinkType_PureSymLink;
     isRelative = false;
-    isWSL = false;
-    linkPath.Empty();
+    isWindowsPath = false;
+    LinkPath.Empty();
   }
 
-  bool Parse(const Byte *data, size_t dataSize, bool isLinuxData);
+  bool Parse_from_WindowsReparseData(const Byte *data, size_t dataSize);
+  bool Parse_from_LinuxData(const Byte *data, size_t dataSize);
+  void Normalize_to_RelativeSafe(UStringVector &removePathParts);
+private:
+  void Remove_AbsPathPrefixes();
 };
 
 #endif // SUPPORT_LINKS
@@ -285,46 +284,44 @@ class CArchiveExtractCallback Z7_final:
   Z7_IFACE_COM7_IMP(IArchiveRequestMemoryUseCallback)
 #endif
 
+  // bool Write_CTime;
+  // bool Write_ATime;
+  // bool Write_MTime;
+  bool _stdOutMode;
+  bool _testMode;
+  bool _removePartsForAltStreams;
+public:
+  bool Is_elimPrefix_Mode;
+private:
+
   const CArc *_arc;
   CExtractNtOptions _ntOptions;
 
-  bool _isSplit;
-
-  bool _extractMode;
-
-  bool Write_CTime;
-  bool Write_ATime;
-  bool Write_MTime;
-  bool _keepAndReplaceEmptyDirPrefixes; // replace them to "_";
-
   bool _encrypted;
-
-  // bool _is_SymLink_in_Data;
-  bool _is_SymLink_in_Data_Linux; // false = WIN32, true = LINUX
-
-  bool _needSetAttrib;
-  bool _isSymLinkCreated;
-  bool _itemFailure;
-
-  bool _some_pathParts_wereRemoved;
-public:
-  bool Is_elimPrefix_Mode;
-
-private:
+  bool _isSplit;
   bool _curSize_Defined;
   bool _fileLength_WasSet;
 
-  bool _removePartsForAltStreams;
+  bool _isRenamed;
+  bool _extractMode;
+  bool _is_SymLink_in_Data_Linux; // false = WIN32, true = LINUX.
+      // _is_SymLink_in_Data_Linux is detected from Windows/Linux part of attributes of file.
+  bool _needSetAttrib;
+  bool _isSymLinkCreated;
+  bool _itemFailure;
+  bool _some_pathParts_wereRemoved;
 
-  bool _stdOutMode;
-  bool _testMode;
   bool _multiArchives;
+  bool _keepAndReplaceEmptyDirPrefixes; // replace them to "_";
+#if defined(_WIN32) && !defined(UNDER_CE) && !defined(Z7_SFX)
+  bool _saclEnabled;
+#endif
 
   NExtract::NPathMode::EEnum _pathMode;
   NExtract::NOverwriteMode::EEnum _overwriteMode;
 
-  const NWildcard::CCensorNode *_wildcardCensor; // we need wildcard for single pass mode (stdin)
   CMyComPtr<IFolderArchiveExtractCallback> _extractCallback2;
+  const NWildcard::CCensorNode *_wildcardCensor; // we need wildcard for single pass mode (stdin)
   // CMyComPtr<ICompressProgressInfo> _compressProgress;
   // CMyComPtr<IArchiveExtractCallbackMessage2> _callbackMessage;
   CMyComPtr<IFolderArchiveExtractCallback2> _folderArchiveExtractCallback2;
@@ -337,15 +334,12 @@ private:
   #ifndef Z7_SFX
 
   CMyComPtr<IFolderExtractToStreamCallback> ExtractToStreamCallback;
-  CGetProp *GetProp_Spec;
-  CMyComPtr<IGetProp> GetProp;
   CMyComPtr<IArchiveRequestMemoryUseCallback> _requestMemoryUseCallback;
   
   #endif
 
   CReadArcItem _item;
   FString _diskFilePath;
-  UInt64 _position;
 
   struct CProcessedFileInfo
   {
@@ -391,9 +385,17 @@ private:
     }
   } _fi;
 
-  UInt32 _index;
+  UInt64 _position;
   UInt64 _curSize;
   UInt64 _fileLength_that_WasSet;
+  UInt32 _index;
+
+// #ifdef SUPPORT_ALT_STREAMS
+#if defined(_WIN32) && !defined(UNDER_CE)
+  DWORD _altStream_NeedRestore_AttribVal;
+  FString _altStream_NeedRestore_Attrib_for_parentFsPath;
+#endif
+// #endif
 
   COutFileStream *_outFileStreamSpec;
   CMyComPtr<ISequentialOutStream> _outFileStream;
@@ -402,9 +404,7 @@ private:
   CBufPtrSeqOutStream *_bufPtrSeqOutStream_Spec;
   CMyComPtr<ISequentialOutStream> _bufPtrSeqOutStream;
 
-
  #ifndef Z7_SFX
-  
   COutStreamWithHash *_hashStreamSpec;
   CMyComPtr<ISequentialOutStream> _hashStream;
   bool _hashStreamWasUsed;
@@ -415,20 +415,14 @@ private:
 
   UStringVector _removePathParts;
 
-  CMyComPtr<ICompressProgressInfo> _localProgress;
   UInt64 _packTotal;
-  
   UInt64 _progressTotal;
-  bool _progressTotal_Defined;
+  // bool _progressTotal_Defined;
 
   CObjectVector<CDirPathTime> _extractedFolders;
   
   #ifndef _WIN32
   // CObjectVector<NWindows::NFile::NDir::CDelayedSymLink> _delayedSymLinks;
-  #endif
-
-  #if defined(_WIN32) && !defined(UNDER_CE) && !defined(Z7_SFX)
-  bool _saclEnabled;
   #endif
 
   void CreateComplexDirectory(const UStringVector &dirPathParts, FString &fullPath);
@@ -444,14 +438,14 @@ public:
   HRESULT SendMessageError_with_Error(HRESULT errorCode, const char *message, const FString &path);
   HRESULT SendMessageError_with_LastError(const char *message, const FString &path);
   HRESULT SendMessageError2(HRESULT errorCode, const char *message, const FString &path1, const FString &path2);
+  HRESULT SendMessageError2_with_LastError(const char *message, const FString &path1, const FString &path2);
 
-public:
-  #if defined(_WIN32) && !defined(UNDER_CE)
+#if defined(_WIN32) && !defined(UNDER_CE) && !defined(Z7_SFX)
   NExtract::NZoneIdMode::EEnum ZoneMode;
   CByteBuffer ZoneBuf;
-  #endif
+#endif
 
-  CLocalProgress *LocalProgressSpec;
+  CMyComPtr2_Create<ICompressProgressInfo, CLocalProgress> LocalProgressSpec;
 
   UInt64 NumFolders;
   UInt64 NumFiles;
@@ -472,11 +466,11 @@ public:
     _multiArchives = multiArchives;
     _pathMode = pathMode;
     _overwriteMode = overwriteMode;
-   #if defined(_WIN32) && !defined(UNDER_CE)
+#if defined(_WIN32) && !defined(UNDER_CE) && !defined(Z7_SFX)
      ZoneMode = zoneMode;
-   #else
+#else
      UNUSED_VAR(zoneMode)
-   #endif
+#endif
     _keepAndReplaceEmptyDirPrefixes = keepAndReplaceEmptyDirPrefixes;
     NumFolders = NumFiles = NumAltStreams = UnpackSize = AltStreams_UnpackSize = 0;
   }
@@ -512,11 +506,16 @@ public:
 private:
   CHardLinks _hardLinks;
   CLinkInfo _link;
+  // const void *NtReparse_Data;
+  // UInt32 NtReparse_Size;
 
   // FString _copyFile_Path;
   // HRESULT MyCopyFile(ISequentialOutStream *outStream);
-  HRESULT Link(const FString &fullProcessedPath);
   HRESULT ReadLink();
+  HRESULT SetLink(
+      const FString &fullProcessedPath_from,
+      const CLinkInfo &linkInfo,
+      bool &linkWasSet);
 
 public:
   // call PrepareHardLinks() after Init()
@@ -555,7 +554,6 @@ private:
   void GetFiTimesCAM(CFiTimesCAM &pt);
   void CreateFolders();
   
-  bool _isRenamed;
   HRESULT CheckExistFile(FString &fullProcessedPath, bool &needExit);
   HRESULT GetExtractStream(CMyComPtr<ISequentialOutStream> &outStreamLoc, bool &needExit);
   HRESULT GetItem(UInt32 index);
@@ -564,16 +562,6 @@ private:
   HRESULT CloseReparseAndFile();
   HRESULT CloseReparseAndFile2();
   HRESULT SetDirsTimes();
-
-  const void *NtReparse_Data;
-  UInt32 NtReparse_Size;
-
-  #ifdef SUPPORT_LINKS
-  HRESULT SetFromLinkPath(
-      const FString &fullProcessedPath,
-      const CLinkInfo &linkInfo,
-      bool &linkWasSet);
-  #endif
 };
 
 
@@ -603,7 +591,8 @@ struct CArchiveExtractCallback_Closer
 
 bool CensorNode_CheckPath(const NWildcard::CCensorNode &node, const CReadArcItem &item);
 
-void ReadZoneFile_Of_BaseFile(CFSTR fileName2, CByteBuffer &buf);
+bool Is_ZoneId_StreamName(const wchar_t *s);
+void ReadZoneFile_Of_BaseFile(CFSTR fileName, CByteBuffer &buf);
 bool WriteZoneFile_To_BaseFile(CFSTR fileName, const CByteBuffer &buf);
 
 #endif

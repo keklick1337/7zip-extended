@@ -1178,11 +1178,11 @@ HRESULT CInArchive::ReadAndDecodePackedStreams(
 
   for (CNum i = 0; i < folders.NumFolders; i++)
   {
-	  CByteBuffer &data = dataVector.AddNew();
-	  const UInt64 unpackSize64 = folders.GetFolderUnpackSize(i);
-	  const size_t unpackSize = (size_t)unpackSize64;
-	  if (unpackSize != unpackSize64)
-		  ThrowUnsupported();
+    CByteBuffer &data = dataVector.AddNew();
+    const UInt64 unpackSize64 = folders.GetFolderUnpackSize(i);
+    const size_t unpackSize = (size_t)unpackSize64;
+    if (unpackSize != unpackSize64)
+      ThrowUnsupported();
 
 	  // by abc321 \/
 	  bool passwordTested = false;
@@ -1197,33 +1197,33 @@ HRESULT CInArchive::ReadAndDecodePackedStreams(
     
     bool dataAfterEnd_Error = false;
 
-		HRESULT result = decoder.Decode(
-			EXTERNAL_CODECS_LOC_VARS
-			_stream, baseOffset + dataOffset,
-			folders, i,
-			NULL, // &unpackSize64
+    HRESULT result = decoder.Decode(
+        EXTERNAL_CODECS_LOC_VARS
+        _stream, baseOffset + dataOffset,
+        folders, i,
+        NULL, // &unpackSize64
+        
+        outStreamSpec,
+        NULL, // *compressProgress
 
-			outStreamSpec,
-			NULL, // *compressProgress
-
-			NULL  // **inStreamMainRes
-			, dataAfterEnd_Error
-
-			Z7_7Z_DECODER_CRYPRO_VARS
-#if !defined(Z7_ST)
-			, false // mtMode
-			, 1     // numThreads
-			, 0     // memUsage
-#endif
-		);
-
-		RINOK(result)
-
-			if (dataAfterEnd_Error)
-				ThereIsHeaderError = true;
-
-		if (unpackSize != outStreamSpec->GetPos())
-			ThrowIncorrect();
+        NULL  // **inStreamMainRes
+        , dataAfterEnd_Error
+        
+        Z7_7Z_DECODER_CRYPRO_VARS
+        #if !defined(Z7_ST)
+          , false // mtMode
+          , 1     // numThreads
+          , 0     // memUsage
+        #endif
+      );
+    
+    RINOK(result)
+    
+    if (dataAfterEnd_Error)
+      ThereIsHeaderError = true;
+    
+    if (unpackSize != outStreamSpec->GetPos())
+      ThrowIncorrect();
 
 		// by abc321 \/
 		if (getNextPassword) {

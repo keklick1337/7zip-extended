@@ -163,8 +163,8 @@ static const char * const kHelpString =
     "  -o{Directory} : set Output directory\n"
     #ifndef Z7_NO_CRYPTO
     "  -p{Password} : set Password\n"
-	"  -fp{FileWithPassword[s]} : set FileWithPassword[s]\n" // by abc321
-#endif
+    "  -fp{FileWithPassword[s]} : set FileWithPassword[s]\n" // by abc321
+    #endif
     "  -r[-|0] : Recurse subdirectories for name search\n"
     "  -sa{a|e|s} : set Archive name mode\n"
     "  -scc{UTF-8|WIN|DOS} : set charset for console input/output\n"
@@ -909,9 +909,12 @@ int Main2(
 
   if (options.EnableHeaders)
   {
-    ShowCopyrightAndHelp(g_StdStream, false);
-    if (!parser.Parse1Log.IsEmpty())
-      *g_StdStream << parser.Parse1Log;
+    if (g_StdStream)
+    {
+      ShowCopyrightAndHelp(g_StdStream, false);
+      if (!parser.Parse1Log.IsEmpty())
+        *g_StdStream << parser.Parse1Log;
+    }
   }
 
   parser.Parse2(options);
@@ -1411,7 +1414,7 @@ int Main2(
 	  // by abc321 /\~
 
       #ifndef Z7_NO_CRYPTO
-	  ecs->PasswordIsDefined = options.PasswordEnabled;
+      ecs->PasswordIsDefined = options.PasswordEnabled;
       ecs->Password = options.Password;
       #endif
 

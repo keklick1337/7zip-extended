@@ -103,7 +103,7 @@ class COpenCallbackImp Z7_final:
  #ifndef Z7_NO_CRYPTO
   public ICryptoGetTextPassword,
   public ICryptoGetNextPassword, // by abc321
-#endif
+ #endif
   public IProgress, // IProgress is used for 7zFM
   public CMyUnknownImp
 {
@@ -113,7 +113,7 @@ class COpenCallbackImp Z7_final:
  #ifndef Z7_NO_CRYPTO
   Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
   Z7_COM_QI_ENTRY(ICryptoGetNextPassword) // by abc321
-#endif
+ #endif
   // Z7_COM_QI_ENTRY(IProgress) // the code doesn't require it
   Z7_COM_QI_END
   Z7_COM_ADDREF_RELEASE
@@ -127,7 +127,7 @@ private:
  #ifndef Z7_NO_CRYPTO
   Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
   Z7_IFACE_COM7_IMP(ICryptoGetNextPassword) // by abc321
-#endif
+ #endif
 
   bool _subArchiveMode;
 
