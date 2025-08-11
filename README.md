@@ -1,4 +1,4 @@
-7zz 25.00 with additional options
+7zz 25.01 with additional options
 
 ## Use passwords list to open archive (new feature)
 
